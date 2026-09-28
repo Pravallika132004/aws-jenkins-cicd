@@ -5,37 +5,25 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo 'Checking out source code...'
                 checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies...'
-                bat 'python -m pip install -r requirements.txt'
+                sh 'python -m pip install -r requirements.txt'
             }
         }
 
-        stage('Test') {
+        stage('Run Tests') {
             steps {
-                echo 'Running tests...'
-                bat 'python -m pytest -v'
+                sh 'python -m pytest -v'
             }
         }
 
-        stage('Security Scan') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Running security scan...'
-                bat 'python -m pip install pip-audit'
-                bat 'python -m pip_audit'
-            }
-        }
-
-        stage('Build Image') {
-            steps {
-                echo 'Building Docker image...'
-                bat 'docker build -t aws-jenkins-cicd:%BUILD_NUMBER% .'
+                sh 'docker build -t aws-jenkins-cicd:latest .'
             }
         }
     }
